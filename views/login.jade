@@ -1,0 +1,236 @@
+doctype html
+// https://console.cloud.google.com/google/maps-apis/overview
+// PHP Verification with Credential
+html
+  head
+    meta(name='viewport', content='initial-scale=1.0, user-scalable=no')
+    meta(charset='utf-8')
+    meta(http-equiv='Cache-Control', content='no-store')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js')
+    script(src='https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css')
+    link(rel='stylesheet', href='https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css')
+    title Silent Voyager
+    style.
+      #map {
+      height: 100%;
+      }
+      html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background-color:white;
+      }
+      .img-construct {
+      position:relative;
+      max-width:200px;
+      }
+      .jumbotron {
+      padding:10px;
+      background-color:#eee;
+      margin-bottom:0px;
+      }
+      .table-scroll {
+      overflow:scroll;
+      max-height:500px;
+      }
+      .normal-background {
+      background-color:#eee;
+      }
+      #map,.table-scroll {
+      margin: 0 auto;
+      }
+      #map {
+      max-height:600px;
+      }
+      #outer-container {
+      color:white;
+      background-image: url("resources/earth3.jpg");
+      background-repeat: no-repeat;
+      background-size:cover;
+      }
+      .dark {
+      color:black;
+      }
+      @media screen and (max-width: 768px) {
+      #container-title-parent {
+      text-align:center;
+      }
+      #container-title-parent h3 {
+      font-size:28px;
+      opacity:.75;
+      }
+      }
+  body
+    #outer-container.jumbotron.container.vertical-center
+      #middle-container.container
+        #container-title-parent.container-fluid
+          h3 Silent Voyager
+        .row.text-center
+          img.img-square.img-construct(src='resources/locator.png')
+        br
+        br
+        div(style='col-xs-12 col-sm-12 col-md-12 col-lg-12')
+          form#form1.form-horizontal(action='login', method='post')
+            .form-group
+              label.control-label.label-bright.col-sm-2.col-sm-offset-2.col-md-offset-2(for='pwd') Start Date:
+              #datetimepicker1.input-group.date.col-sm-5.col-md-4.col-lg-4.dark
+                input.form-control.transparent(type='text', name='date_begin', required='', placeholder='Start Date')
+                span.input-group-addon
+                  span.glyphicon.glyphicon-calendar
+            .form-group
+              label.control-label.label-bright.col-sm-2.col-sm-offset-2.col-md-offset-2(for='pwd') End Date:
+              #datetimepicker2.input-group.date.col-sm-5.col-md-4.col-lg-4.dark
+                input.form-control.transparent(type='text', name='date_end', required='', placeholder='End Date')
+                span.input-group-addon
+                  span.glyphicon.glyphicon-calendar
+              input(type='hidden', name='username', value='#{username}')
+              input(type='hidden', name='pwd', value='#{pwd}')
+            br
+            .form-group
+              .col-sm-offset-4.col-sm-10.col-md-10.col-md-offset-4
+                button.btn.btn-default.transparent(type='submit') Submit
+      br
+    .container.normal-background.table-scroll
+      h2 Location Info
+      p
+        | Below is the information about the specific user's location starting at the most recent occurrence.
+      p#dateLabel Showing Results for: 
+    .container.table-scroll.normal-background
+      table#table_info.table.table-striped
+        thead
+          tr
+            th Username
+            th Latitude
+            th Longitude
+            th Altitude
+            th City
+            th Hour
+            th Minute
+            th Second
+            th Month
+            th Day
+            th Year
+        tbody
+    #map.container
+    script.
+      
+      var el = document.getElementById("dateLabel");
+
+      var startDate, endDate;
+
+      if("!{startDateString}" === "Invalid date"
+      || "!{endDateString}" === "Invalid date") {
+
+        startDate="Invalid"; endDate="Invalid";
+        el.appendChild(document.createTextNode("Entire History"));
+
+      } else {
+        startDate = "!{startDateString}";
+        endDate = "!{endDateString}";
+        
+        el.appendChild(document.createTextNode("!{startDateStringNormalized}" + " to " + "!{endDateStringNormalized}"));
+      }
+
+
+      var coordinates = new Array();
+      var obj = {};
+      var arr = JSON.parse('!{resultsArr}');
+
+      for(i = 0; i < arr.length; i++) {
+        
+        obj = {};
+        
+        if((arr[i]["DateStamp"] <= endDate && arr[i]["DateStamp"] >= startDate) || startDate === "Invalid") { 
+          obj.lat=parseFloat(arr[i]["Latitude"]);
+          obj.lng=parseFloat(arr[i]["Longitude"]);
+          coordinates.push(obj);
+        }
+
+      }
+
+    script.
+      var tableData = document.querySelector('#table_info tbody');
+      var arr = JSON.parse('!{resultsArr}');
+      var index = 0; //IMPORTANT: Can't use 'z' for index since we need to keep track of row
+
+      for(z = 0; z < arr.length; z++) {
+
+        if((arr[z]["DateStamp"] <= endDate && arr[z]["DateStamp"] >= startDate) || startDate === "Invalid") { 
+
+          var row = tableData.insertRow(index++);
+          var dateArr = arr[z]["DateStamp"].split("_"); // Year, month, Day, Hour, Min, Sec
+
+          row.insertCell(0).innerHTML=arr[z]["Username"];
+          row.insertCell(1).innerHTML=arr[z]["Latitude"];
+          row.insertCell(2).innerHTML=arr[z]["Longitude"];
+          row.insertCell(3).innerHTML=arr[z]["Altitude"];
+          row.insertCell(4).innerHTML=arr[z]["City"];
+          row.insertCell(5).innerHTML=dateArr["3"];
+          row.insertCell(6).innerHTML=dateArr["4"];
+          row.insertCell(7).innerHTML=dateArr["5"];
+          row.insertCell(8).innerHTML=dateArr["1"];
+          row.insertCell(9).innerHTML=dateArr["2"];
+          row.insertCell(10).innerHTML=dateArr["0"];
+        }
+      }
+
+    script.
+      function initMap() {
+      var map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 18,
+      center: coordinates[coordinates.length-1],
+      mapTypeId: 'terrain'
+      });
+      var infowindow = new google.maps.InfoWindow();
+      var marker, i;
+      for (i = 0; i < coordinates.length; i++) {
+      marker = new google.maps.Marker({
+      position: coordinates[i],
+      map: map
+      });
+      google.maps.event.addListener(marker, 'click', (function(marker, i) {
+      return function() {
+      infowindow.setContent("("+coordinates[i].lat+", " + coordinates[i].lng + ") Position: " + (i+1));
+      infowindow.open(map, marker);
+      }
+      })(marker, i));
+      }
+      var trackPath = new google.maps.Polyline({
+      path: coordinates,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1.0,
+      strokeWeight: 2
+      });
+
+      trackPath.setMap(map);
+
+      }
+
+
+
+    script(async='', defer='', src='https://maps.googleapis.com/maps/api/js?key=AIzaSyCUx4bfecGJ_7_2Ekf_B8Dte67cTyHoKhg&callback=initMap')
+      // FIX LATER
+    script.
+      $(function() {
+      $('#datetimepicker1').datetimepicker();
+      });
+      $(function() {
+      $('#datetimepicker2').datetimepicker();
+      });
+      $(document).ready(function() {
+      var table = $('#table_info').DataTable();
+      table
+      .order( [[10, 'desc' ], [9, 'desc' ], [8, 'desc' ],
+      [5, 'desc' ], [6, 'desc' ], [7, 'desc' ]] )
+      .draw();
+      });
+      document.getElementById("form1").reset();
+
+

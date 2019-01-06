@@ -1,0 +1,80 @@
+doctype html
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(charset='utf-8')
+    meta(http-equiv='Pragma', content='no-cache')
+    meta(name='viewport', content='width=device-width, initial-scale=1')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/js/bootstrap-datetimepicker.min.js')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css')
+    title Silent Voyager
+    style.
+      #myVideo {
+      position: fixed;
+      right: 0;
+      bottom: 0;
+      min-width: 100%;
+      min-height: 100%;
+      }
+      .transparent {
+      background: rgba(255, 255, 255, 0);
+      color:#eee;
+      }
+      .img-construct {
+      position:relative;
+      max-width:200px;
+      }
+      body {
+      display: table;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      }
+      .jumbotron {
+      display: table-cell;
+      vertical-align: middle;
+      }
+      .label-bright {
+      color: white;
+      }
+  body
+    script.
+      if("#{msg}") {
+      alert("#{msg}");
+      }
+      
+    video#myVideo(autoplay='', muted='', loop='')
+      source(src='./resources/backgroundvideo.mp4')
+    .jumbotron.vertical-center
+      .container
+        .row.text-center
+          img.img-square.img-construct(src='/resources/locator.png')
+        br
+        br
+        div(style='col-xs-12 col-sm-12 col-md-12 col-lg-12')
+          form#form1.form-horizontal(action='/login', method='POST')
+            .form-group
+              label.control-label.label-bright.col-sm-2.col-sm-offset-2.col-md-offset-2(for='username') Username:
+              .col-sm-5.col-md-4.col-lg-4
+                input#username.form-control.transparent(type='username', name='username', placeholder='Enter username', required='')
+            .form-group
+              label.control-label.label-bright.col-sm-2.col-sm-offset-2.col-md-offset-2(for='pwd') Password:
+              .col-sm-5.col-md-4.col-lg-4
+                input#pwd.form-control.transparent(type='password', name='pwd', placeholder='Enter password', required='')
+            br
+            .form-group
+              .col-sm-offset-4.col-sm-10.col-md-10.col-md-offset-4
+                button.btn.btn-default.transparent(type='submit') Submit
+    script.
+      $(function() {
+      $('#datetimepicker1').datetimepicker();
+      });
+      $(function() {
+      $('#datetimepicker2').datetimepicker();
+      });
+      document.getElementById("form1").reset();
+
